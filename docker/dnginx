@@ -1,6 +1,6 @@
 FROM nginx:stable-bookworm-perl
 
-COPY nginx/etc/templates/default.conf /etc/nginx/templates/default.conf.template
+COPY ./nginx/etc/templates/default.conf /etc/nginx/templates/default.conf.template
 
 WORKDIR /var/www/html
 

@@ -47,9 +47,10 @@ services:
     container_name: nginx
     image: nginx:stable-bookworm-perl
     volumes:
-      - ./trade:/var/www/html
+      - .:/var/www/html
     build:
-      context: ./docker/nginx
+      context: ./docker/
+      dockerfile: dnginx
     depends_on:
       - php
     ports:
