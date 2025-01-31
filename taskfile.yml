@@ -1,0 +1,9 @@
+version: '3'
+
+silent: true
+
+tasks:
+  up:
+    - docker compose up --build -d
+  down:
+    - docker compose down --remove-orphans
