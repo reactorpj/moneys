@@ -4,6 +4,23 @@ silent: true
 
 tasks:
   up:
-    - docker compose up --build -d
+    cmds:
+      - docker compose up --build -d
   down:
-    - docker compose down --remove-orphans
+    cmds:
+      - docker compose down --remove-orphans
+  cliu:
+    cmds:
+      - docker exec -it -u $(id -u):$(id -g) cli {{.CLI_ARGS}}
+  cli:
+    cmds:
+      - docker exec -it cli {{.CLI_ARGS}}
+  console:
+    cmds:
+      - docker exec -it cli php bin/console {{.CLI_ARGS}}
+  symf:
+    cmds:
+      - docker exec -it cli symfony {{.CLI_ARGS}}
+  test:
+    cmds:
+      - docker exec -it cli php bin/phpunit

@@ -28,20 +28,20 @@ services:
     tty: true
 
   db:
-    container_name: db
+    container_name: ${DB_HOST}
     image: mariadb:11.6-ubi
     volumes:
       - dbdata:/var/lib/mysql
     environment:
-      - MARIADB_ROOT_PASSWORD=root
-      - MARIADB_DATABASE=trade
-      - MARIADB_USER=user
-      - MARIADB_PASSWORD=user
+      - MARIADB_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      - MARIADB_DATABASE=${DB_DATABASE}
+      - MARIADB_USER=${DB_USERNAME}
+      - MARIADB_PASSWORD=${DB_USER_PASSWORD}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     restart: unless-stopped
     ports:
-      - "3306:3306"
+      - "3306"
 
   nginx:
     container_name: nginx
