@@ -11,7 +11,7 @@ services:
       - .:/var/www/html
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    restart: unless-stopped
+    restart: on-failure
     depends_on:
       - db
 
@@ -24,7 +24,7 @@ services:
       - .:/var/www/html
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    restart: unless-stopped
+    restart: on-failure
     tty: true
 
   db:
@@ -39,7 +39,13 @@ services:
       - MARIADB_PASSWORD=${DB_USER_PASSWORD}
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "healthcheck.sh", "--connect", "--innodb_initialized" ]
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    restart: on-failure
     ports:
       - "3306"
 
@@ -57,7 +63,7 @@ services:
       - "8080:80"
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    restart: unless-stopped
+    restart: on-failure
 
 volumes:
   dbdata:
