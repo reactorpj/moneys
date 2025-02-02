@@ -32,6 +32,7 @@ services:
     image: mariadb:11.6-ubi
     volumes:
       - dbdata:/var/lib/mysql
+      - ./docker/db/init.sql:/docker-entrypoint-initdb.d/init.sql
     environment:
       - MARIADB_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
       - MARIADB_DATABASE=${DB_DATABASE}
@@ -47,11 +48,10 @@ services:
       retries: 3
     restart: on-failure
     ports:
-      - "3306"
+      - "3306:3306"
 
   nginx:
     container_name: nginx
-    image: nginx:stable-bookworm-perl
     volumes:
       - .:/var/www/html
     build:
@@ -64,6 +64,32 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     restart: on-failure
+
+  mailer:
+    image: mailhog/mailhog
+    ports:
+      - "8082:8025"
+
+  node:
+    container_name: watch
+    image: node:latest
+    volumes:
+      - .:var/www/html
+    command:
+      - npm init
+
+  node-watch:
+    container_name: node-watch
+    image: node:latest
+    volumes:
+      - .:/var/www/html
+    depends_on:
+      node:
+        condition: service_started
+    command:
+      - npm run watch
+
+
 
 volumes:
   dbdata:
