@@ -21,6 +21,7 @@ services:
       context: ./docker/
       dockerfile: dcli
     volumes:
+      - ~/dev/scratches:/var/www/scratches
       - .:/var/www/html
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -68,26 +69,23 @@ services:
   mailer:
     image: mailhog/mailhog
     ports:
+      - "1025"
       - "8082:8025"
 
   node:
-    container_name: watch
+    container_name: node
     image: node:latest
-    volumes:
-      - .:var/www/html
-    command:
-      - npm init
-
-  node-watch:
-    container_name: node-watch
-    image: node:latest
+    tty: true
+    working_dir: /var/www/html
     volumes:
       - .:/var/www/html
-    depends_on:
-      node:
-        condition: service_started
-    command:
-      - npm run watch
+
+#  node-watch:
+#    container_name: node-watch
+#    image: node:latest
+#    tty: true
+#    volumes:
+#      - .:/var/www/html
 
 
 

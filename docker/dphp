@@ -30,3 +30,8 @@ COPY php/conf/custom.ini $PHP_INI_DIR/conf.d/custom.ini
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 RUN ln -s /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini
+
+COPY --from=aheadworks/mhsendmail /usr/bin/mhsendmail /usr/bin/mhsendmail
+
+RUN sed -i '/#!\/bin\/sh/aecho "$(hostname -i)\t$(hostname) $(hostname).localhost" >> /etc/hosts' /usr/local/bin/docker-php-entrypoint
+#RUN echo "localhost localhost.localdomain" >> /etc/hosts
