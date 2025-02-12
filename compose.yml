@@ -6,6 +6,7 @@ services:
     build:
       context: ./docker/
       dockerfile: dphp
+    cgroup: host
     volumes:
       - ~/dev/scratches:/var/www/scratches
       - .:/var/www/html
@@ -20,6 +21,7 @@ services:
     build:
       context: ./docker/
       dockerfile: dcli
+    cgroup: host
     volumes:
       - ~/dev/scratches:/var/www/scratches
       - .:/var/www/html
@@ -72,13 +74,13 @@ services:
       - "1025"
       - "8082:8025"
 
-  node:
-    container_name: node
-    image: node:latest
-    tty: true
-    working_dir: /var/www/html
-    volumes:
-      - .:/var/www/html
+#  node:
+#    container_name: node
+#    image: node:latest
+#    tty: true
+#    working_dir: /var/www/html
+#    volumes:
+#      - .:/var/www/html
 
 #  node-watch:
 #    container_name: node-watch

@@ -1,6 +1,7 @@
 FROM php:8.4-cli-bookworm
 
-WORKDIR /var/www/html
+ARG USER_ID=1000
+ARG GROUP_ID=1000
 
 ADD --chmod=0755 https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 
@@ -21,7 +22,8 @@ RUN install-php-extensions \
     iconv \
     intl \
     opcache \
-    zip
+    zip \
+    dom
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
@@ -38,4 +40,13 @@ RUN ln -s /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini
 COPY --from=aheadworks/mhsendmail /usr/bin/mhsendmail /usr/bin/mhsendmail
 
 RUN sed -i '/#!\/bin\/sh/aecho "$(hostname -i)\t$(hostname) $(hostname).localhost" >> /etc/hosts' /usr/local/bin/docker-php-entrypoint
-#RUN echo "localhost localhost.localdomain" >> /etc/hosts
+
+
+WORKDIR /var/www/html
+
+RUN composer require --dev vimeo/psalm
+
+RUN groupadd -g $GROUP_ID pjo
+RUN useradd -u $USER_ID -g pjo -ms /bin/bash pjo
+RUN chown -R pjo:pjo .
+USER pjo

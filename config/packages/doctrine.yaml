@@ -1,6 +1,12 @@
 doctrine:
     dbal:
         url: '%env(resolve:DATABASE_URL)%'
+        types:
+            datetime_immutable: \Carbon\Doctrine\DateTimeImmutableType
+            datetime: \Carbon\Doctrine\DateTimeType
+            user_user_id: App\Domain\ValueObject\User\Type\IdType
+            user_user_email: \App\Domain\ValueObject\User\Type\EmailType
+            user_user_role: \App\Domain\ValueObject\User\Type\RoleType
 
         # IMPORTANT: You MUST configure your server version,
         # either here or in the DATABASE_URL env var (see .env file)
@@ -21,8 +27,8 @@ doctrine:
             App:
                 type: attribute
                 is_bundle: false
-                dir: '%kernel.project_dir%/src/Entity'
-                prefix: 'App\Entity'
+                dir: '%kernel.project_dir%/src/Domain'
+                prefix: 'App\Domain'
                 alias: App
         controller_resolver:
             auto_mapping: false
