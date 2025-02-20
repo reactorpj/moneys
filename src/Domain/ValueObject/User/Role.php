@@ -4,22 +4,22 @@ declare(strict_types=1);
 
 namespace App\Domain\ValueObject\User;
 
-use App\Domain\Type\UserRole;
-
 final readonly class Role
 {
+	public const ROLE_USER = 'ROLE_USER';
+	public const ROLE_ADMIN = 'ROLE_ADMIN';
 	private array $roles;
 
 	/**
-	 * @param UserRole[] $roles
+	 * @param string[] $roles
 	 */
 	public function __construct(array $roles)
 	{
-		$this->roles = array_unique(array_filter($roles, fn($role) => $role instanceof UserRole));
+		$this->roles = array_unique($roles);
 	}
 
 	/**
-	 * @param UserRole[] $roles
+	 * @param string[] $roles
 	 * @return self
 	 */
 	public static function fromArray(array $roles): self

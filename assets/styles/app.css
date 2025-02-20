@@ -7,7 +7,12 @@ body {
     margin: 0 auto;
 }
 
-header{
+header {
     height: 50px;
     background-color: #ccc;
+}
+
+header .wrapper {
+    display: flex;
+    justify-content: space-between;
 }

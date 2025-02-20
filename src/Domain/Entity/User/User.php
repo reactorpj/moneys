@@ -4,55 +4,56 @@ declare(strict_types=1);
 
 namespace App\Domain\Entity\User;
 
-use App\Domain\Type\UserRole;
 use App\Domain\ValueObject\User\Email;
 use App\Domain\ValueObject\User\Id;
 use App\Domain\ValueObject\User\Password;
+use App\Domain\ValueObject\User\Role;
 use App\Infrastructure\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Doctrine\ORM\Mapping\Column;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 
-#[ORM\Table(name: 'user_users', uniqueConstraints: [new UniqueEntity(['fields' => 'email'])])]
+#[ORM\Table(name: 'user_users')]
 #[ORM\HasLifecycleCallbacks]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
 	#[ORM\Id]
-	#[ORM\Column(type: 'user_user_id', length: 36)]
+	#[Column(type: 'user_user_id', length: 36)]
 	#[Assert\NotBlank]
 	private Id $id;
 
-	#[ORM\Column(type: 'user_user_email', length: 255)]
+	#[Column(type: 'user_user_email', length: 255)]
 	#[Assert\NotBlank]
 	private Email $email;
 
-	#[ORM\Column(type: 'user_user_role', length: 255)]
+	#[Column(type: 'user_user_role', length: 255)]
 	#[Assert\NotBlank]
-	private array $roles;
+	private Role $roles;
 
-	#[ORM\Embedded(class: Password::class, columnPrefix: '')]
+	#[ORM\Embedded(class: Password::class, columnPrefix: false)]
 	private Password $passwordHash;
 
 	private function __construct(
-		Id    $id,
-		Email $email,
+		Id       $id,
+		Email    $email,
 		Password $password,
+		Role $roles,
 	)
 	{
 		$this->id = $id;
 		$this->email = $email;
-		$this->roles = [UserRole::USER];
+		$this->roles = $roles;
 		$this->passwordHash = $password;
 	}
 
-	public static function create(Id $id, Email $email, Password $password): self
+	public static function createForUser(Id $id, Email $email, Password $password): self
 	{
-		return new self($id, $email, $password);
+		return new self($id, $email, $password, Role::fromArray([Role::ROLE_USER]));
 	}
 
 	/**
@@ -101,21 +102,27 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
 	public function getRoles(): array
 	{
-		$roles = $this->roles;
-		// guarantee every user at least has ROLE_USER
-		$roles[] = UserRole::USER;
-
-		return array_unique($roles);
+		return $this->roles->getValue();
 	}
 
 	/**
-	 * @param UserRole[] $roles
+	 * @param Role $roles
+	 * @return $this
 	 */
-	public function setRoles(array $roles): static
+	public function setRoles(Role $roles): static
 	{
 		$this->roles = $roles;
 
 		return $this;
+	}
+
+	/**
+	 * @param string $role
+	 * @return void
+	 */
+	public function addRole(string $role): void
+	{
+		$this->roles = Role::fromArray([...$this->roles->getValue(), Role::ROLE_USER]);
 	}
 
 	/**
@@ -136,7 +143,5 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 	 */
 	public function eraseCredentials(): void
 	{
-		// If you store any temporary, sensitive data on the user, clear it here
-		// $this->plainPassword = null;
 	}
 }

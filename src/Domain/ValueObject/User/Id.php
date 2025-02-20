@@ -9,9 +9,9 @@ use Ramsey\Uuid\Uuid;
 final readonly class Id
 {
 	/**
-	 * @param string $uuid
+	 * @param string $value
 	 */
-	private function __construct(private string $uuid) { }
+	private function __construct(private string $value) { }
 
 	/**
 	 * @return Id
@@ -35,6 +35,11 @@ final readonly class Id
 	 */
 	public function getValue(): string
 	{
-		return $this->uuid;
+		return $this->value;
+	}
+
+	public function __toString(): string
+	{
+		return $this->value;
 	}
 }
